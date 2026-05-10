@@ -167,7 +167,7 @@ function showNextPlayerAnimation(playerName) {
     let anim = document.getElementById("nextPlayerAnim");
     anim.innerHTML = playerName + "'s Turn!";
     anim.classList.add("show");
-    
+
     // Hide after 3 seconds
     nextPlayerTimeout = setTimeout(() => {
         anim.classList.remove("show");
@@ -295,46 +295,50 @@ function updateUI() {
 
     let html = "<h3>Scoreboard</h3><table style='margin:auto; border-collapse:collapse;'>";
     html += "<tr><th>Round</th>";
-    
+
     let list = inPlayoffs ? playoffPlayers : players;
     list.forEach(p => html += "<th>"+p+"</th>");
+    html += "<th>Total</th></tr>";
     html += "</tr>";
 
     let labels = inPlayoffs ? playoffNames : roundNames;
-    
+
     labels.forEach((r, i) => {
         html += "<tr>";
         html += "<td>"+r+"</td>";
-        
+
+        let roundTotal = 0;
         list.forEach(p => {
             let val = inPlayoffs ? (scores[p][12+i] || 0) : scores[p][i];
             html += "<td>"+val+"</td>";
+            roundTotal += val;
         });
-        
+
+        html += "<td><strong>"+roundTotal+"</strong></td></tr>";
         html += "</tr>";
     });
-    
+
     // Total row
     html += "<tr style='border-top:2px solid teal;'>";
     html += "<td><strong>Total</strong></td>";
     let totals = {};
     list.forEach(p => {
         let total = 0;
-labels.forEach((r,i)=>{
-    let val = inPlayoffs ? (scores[p][12+i] || 0) : scores[p][i];
-    html += "<td>"+val+"</td>";
-    total += val;
-});
-html += "<td>"+total+"</td></tr>";
+        labels.forEach((r,i)=>{
+            let val = inPlayoffs ? (scores[p][12+i] || 0) : scores[p][i];
+            total += val;
+        });
+        totals[p] = total;
+        html += "<td><strong>"+total+"</strong></td>";
     });
+    html += "<td></td></tr>";
     html += "</tr>";
     
-    // PPR (Points Per Round) row - total points divided by darts thrown (3 per round)
+    // PPR (Points Per Round) row
     html += "<tr>";
     html += "<td><strong>PPR</strong></td>";
     list.forEach(p => {
-        let dartCount = labels.length * 3; // 3 darts per round
-        let ppd = dartCount > 0 ? (totals[p] / dartCount).toFixed(2) : 0;
+        let ppr = labels.length > 0 ? (totals[p] / labels.length).toFixed(2) : 0;
         html += "<td><strong>"+ppr+"</strong></td>";
     });
     html += "</tr>";
