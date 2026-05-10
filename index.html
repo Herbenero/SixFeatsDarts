@@ -298,7 +298,7 @@ function updateUI() {
     
     let list = inPlayoffs ? playoffPlayers : players;
     list.forEach(p => html += "<th>"+p+"</th>");
-    html += "<th>Total</th></tr>";
+    html += "</tr>";
 
     let labels = inPlayoffs ? playoffNames : roundNames;
     
@@ -306,28 +306,37 @@ function updateUI() {
         html += "<tr>";
         html += "<td>"+r+"</td>";
         
-        let roundTotal = 0;
         list.forEach(p => {
             let val = inPlayoffs ? (scores[p][12+i] || 0) : scores[p][i];
             html += "<td>"+val+"</td>";
-            roundTotal += val;
         });
         
-        html += "<td><strong>"+roundTotal+"</strong></td></tr>";
+        html += "</tr>";
     });
     
     // Total row
     html += "<tr style='border-top:2px solid teal;'>";
     html += "<td><strong>Total</strong></td>";
+    let totals = {};
     list.forEach(p => {
         let total = 0;
         labels.forEach((r,i)=>{
             let val = inPlayoffs ? (scores[p][12+i] || 0) : scores[p][i];
             total += val;
         });
+        totals[p] = total;
         html += "<td><strong>"+total+"</strong></td>";
     });
-    html += "<td></td></tr>";
+    html += "</tr>";
+    
+    // PPR (Points Per Round) row
+    html += "<tr>";
+    html += "<td><strong>PPR</strong></td>";
+    list.forEach(p => {
+        let ppr = labels.length > 0 ? (totals[p] / labels.length).toFixed(2) : 0;
+        html += "<td><strong>"+ppr+"</strong></td>";
+    });
+    html += "</tr>";
 
     html += "</table>";
     document.getElementById("scoreboard").innerHTML = html;
