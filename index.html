@@ -8,13 +8,8 @@
     button { padding:12px 20px; margin:8px; font-size:18px; border-radius:8px; cursor:pointer; }
     .disabled { opacity:0.25; pointer-events:none; }
 
-    .avatar {
-        width:60px; height:60px; border-radius:50%; object-fit:cover;
-        border:3px solid teal; margin-bottom:10px;
-    }
-
-    #scoreboard { margin-top:25px; font-size:20px; }
-    #scoreboard th, #scoreboard td { padding:10px 18px; }
+    #scoreboard { margin-top:25px; font-size:16px; }
+    #scoreboard th, #scoreboard td { padding:8px 12px; }
 
     #winnerBanner {
         background:teal; color:white; padding:20px; font-size:26px;
@@ -47,7 +42,7 @@
 <h1>Six Feats Darts</h1>
 
 <div id="setup">
-    <h2>Enter Players & Upload Avatars</h2>
+    <h2>Enter Players</h2>
     <div id="playerInputs"></div>
     <button onclick="addPlayerField()">Add Player</button><br><br>
     <button onclick="startGame()">Start Game</button>
@@ -57,7 +52,6 @@
     <h2 id="roundLabel"></h2>
 
     <div id="currentPlayerBox">
-        <img id="currentAvatar" class="avatar">
         <h3 id="playerLabel"></h3>
     </div>
 
@@ -89,7 +83,6 @@ const playoffNames = [
 ];
 
 let players = [];
-let avatars = {};
 let scores = {};
 let round = 0;
 let dart = 0;
@@ -103,7 +96,6 @@ function addPlayerField() {
     let div = document.createElement("div");
     div.innerHTML = `
         <input type="text" placeholder="Player name">
-        <input type="file" accept="image/*">
         <br><br>
     `;
     document.getElementById("playerInputs").appendChild(div);
@@ -116,20 +108,11 @@ function startGame() {
 
     inputs.forEach(div => {
         let name = div.querySelector("input[type=text]").value.trim();
-        let file = div.querySelector("input[type=file]").files[0];
 
         if (!name) return;
 
         players.push(name);
         scores[name] = Array(12).fill(0);
-
-        if (file) {
-            let reader = new FileReader();
-            reader.onload = e => avatars[name] = e.target.result;
-            reader.readAsDataURL(file);
-        } else {
-            avatars[name] = ""; // no avatar
-        }
     });
 
     if (players.length === 0) return;
@@ -257,7 +240,6 @@ function updateUI() {
     let p = inPlayoffs ? playoffPlayers[currentPlayer] : players[currentPlayer];
 
     document.getElementById("playerLabel").innerHTML = p + " (Dart " + (dart+1) + "/3)";
-    document.getElementById("currentAvatar").src = avatars[p] || "";
 
     let bull = isBullseyeRound();
 
@@ -269,27 +251,40 @@ function updateUI() {
     document.getElementById("outerBtn").classList.toggle("disabled", !bull);
 
     let html = "<h3>Scoreboard</h3><table style='margin:auto; border-collapse:collapse;'>";
-    html += "<tr><th>Avatar</th><th>Player</th>";
-
-    let labels = inPlayoffs ? playoffNames : roundNames;
-    labels.forEach(r => html += "<th>"+r+"</th>");
+    html += "<tr><th>Round</th>";
+    
+    let list = inPlayoffs ? playoffPlayers : players;
+    list.forEach(p => html += "<th>"+p+"</th>");
     html += "<th>Total</th></tr>";
 
-    let list = inPlayoffs ? playoffPlayers : players;
-
-    list.forEach(p => {
+    let labels = inPlayoffs ? playoffNames : roundNames;
+    
+    labels.forEach((r, i) => {
         html += "<tr>";
-        html += `<td><img src="${avatars[p] || ""}" class="avatar" style="width:40px;height:40px;"></td>`;
-        html += "<td>"+p+"</td>";
-
+        html += "<td>"+r+"</td>";
+        
+        let roundTotal = 0;
+        list.forEach(p => {
+            let val = inPlayoffs ? (scores[p][12+i] || 0) : scores[p][i];
+            html += "<td>"+val+"</td>";
+            roundTotal += val;
+        });
+        
+        html += "<td><strong>"+roundTotal+"</strong></td></tr>";
+    });
+    
+    // Total row
+    html += "<tr style='border-top:2px solid teal;'>";
+    html += "<td><strong>Total</strong></td>";
+    list.forEach(p => {
         let total = 0;
         labels.forEach((r,i)=>{
             let val = inPlayoffs ? (scores[p][12+i] || 0) : scores[p][i];
-            html += "<td>"+val+"</td>";
             total += val;
         });
-        html += "<td>"+total+"</td></tr>";
+        html += "<td><strong>"+total+"</strong></td>";
     });
+    html += "<td></td></tr>";
 
     html += "</table>";
     document.getElementById("scoreboard").innerHTML = html;
