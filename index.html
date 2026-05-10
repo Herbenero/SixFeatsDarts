@@ -329,12 +329,13 @@ function updateUI() {
     });
     html += "</tr>";
     
-    // PPR (Points Per Round) row
+    // PPR (Points Per Dart) row - total points divided by darts thrown (3 per round)
     html += "<tr>";
-    html += "<td><strong>PPR</strong></td>";
+    html += "<td><strong>PPD</strong></td>";
     list.forEach(p => {
-        let ppr = labels.length > 0 ? (totals[p] / labels.length).toFixed(2) : 0;
-        html += "<td><strong>"+ppr+"</strong></td>";
+        let dartCount = labels.length * 3; // 3 darts per round
+        let ppd = dartCount > 0 ? (totals[p] / dartCount).toFixed(2) : 0;
+        html += "<td><strong>"+ppd+"</strong></td>";
     });
     html += "</tr>";
 
