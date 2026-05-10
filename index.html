@@ -320,22 +320,29 @@ function updateUI() {
     let totals = {};
     list.forEach(p => {
         let total = 0;
-        labels.forEach((r,i)=>{
-            let val = inPlayoffs ? (scores[p][12+i] || 0) : scores[p][i];
-            total += val;
-        });
-        totals[p] = total;
-        html += "<td><strong>"+total+"</strong></td>";
+labels.forEach((r,i)=>{
+    let val = inPlayoffs ? (scores[p][12+i] || 0) : scores[p][i];
+    html += "<td>"+val+"</td>";
+    total += val;
+});
+
+// Rounds played
+let roundsPlayed = inPlayoffs ? (playoffRound + 1) : (round + 1);
+
+// Average points per round (PPD replacement)
+let avg = roundsPlayed > 0 ? (total / roundsPlayed).toFixed(2) : "0.00";
+
+html += "<td>"+avg+"</td><td>"+total+"</td></tr>";
     });
     html += "</tr>";
     
     // PPR (Points Per Dart) row - total points divided by darts thrown (3 per round)
     html += "<tr>";
-    html += "<td><strong>PPD</strong></td>";
+    html += "<td><strong>PPR</strong></td>";
     list.forEach(p => {
         let dartCount = labels.length * 3; // 3 darts per round
         let ppd = dartCount > 0 ? (totals[p] / dartCount).toFixed(2) : 0;
-        html += "<td><strong>"+ppd+"</strong></td>";
+        html += "<td><strong>"+ppr+"</strong></td>";
     });
     html += "</tr>";
 
