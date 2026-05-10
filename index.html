@@ -325,14 +325,7 @@ labels.forEach((r,i)=>{
     html += "<td>"+val+"</td>";
     total += val;
 });
-
-// Rounds played
-let roundsPlayed = inPlayoffs ? (playoffRound + 1) : (round + 1);
-
-// Average points per round (PPD replacement)
-let avg = roundsPlayed > 0 ? (total / roundsPlayed).toFixed(2) : "0.00";
-
-html += "<td>"+avg+"</td><td>"+total+"</td></tr>";
+html += "<td>"+total+"</td></tr>";
     });
     html += "</tr>";
     
